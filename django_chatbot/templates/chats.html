@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Your Chats</h2>
+
+{% if chats %}
+    <ul>
+    {% for chat in chats %}
+        <li><a href="{% url 'chatbot' chat.chat_id|urlencode %}">{{ chat.chat_id }}</a></li>
+    {% endfor %}
+    
+    </ul>
+{% else %}
+    <p>You have no chats.</p>
+{% endif %}
+
+<form action="{% url 'create_chat' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Create New Chat</button>
+</form>
+
+{% endblock %}

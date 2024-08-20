@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Create a New Chat</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Save">
+</form>
+<a href="{% url 'chats' %}" class="cancel-button">Cancel</a>
+
+
+{% endblock %}

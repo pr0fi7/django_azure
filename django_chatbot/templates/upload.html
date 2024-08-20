@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Upload Document for {{ chat_id }}</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" id="uploadBtn">Upload</button>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const chatId = "{{ chat_id }}";
+
+    document.getElementById('uploadBtn').addEventListener('click', function(event) {
+        event.preventDefault();
+        const form = event.target.form;
+
+        // Perform form submission using Fetch API or any other method you prefer
+        const formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+        }).then(response => {
+            if (response.ok) {
+                // Redirect to the chat page after successful upload
+                window.location.href = `{{ request.scheme }}://{{ request.get_host }}{% url 'chatbot' 'chatIdPlaceholder' %}`.replace('chatIdPlaceholder', chatId);
+            } else {
+                console.error('Failed to upload the document.');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    });
+</script>
+{% endblock %}
