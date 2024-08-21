@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-wsa9k4v_goql%t8rn@q4*5flo+xnnxa%8!^p2g(4g-=py==ur)
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', "django-azure.onrender.com"]
 
 
 # Application definition
