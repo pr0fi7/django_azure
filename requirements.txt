@@ -20,7 +20,8 @@ cryptography==43.0.0
 dataclasses-json==0.6.7
 Deprecated==1.2.14
 distro==1.9.0
-Django==5.1
+dj-database-url==2.2.0
+Django==3.2.1
 fastapi==0.112.1
 filelock==3.15.4
 flatbuffers==24.3.25
@@ -30,6 +31,7 @@ google-auth==2.34.0
 googleapis-common-protos==1.63.2
 greenlet==3.0.3
 grpcio==1.65.5
+gunicorn==23.0.0
 h11==0.14.0
 httpcore==1.0.5
 httptools==0.6.1
@@ -91,6 +93,7 @@ PyPika==0.48.9
 pyproject_hooks==1.1.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
+pytz==2024.1
 PyYAML==6.0.2
 regex==2024.7.24
 requests==2.32.3
