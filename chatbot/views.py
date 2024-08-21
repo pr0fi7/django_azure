@@ -28,11 +28,6 @@ openaiapi = os.getenv("OPENAI_API_KEY")
 
 CHROMA_PATH = "chroma.db"
 
-
-client = openai.OpenAI(
-    api_key = os.environ.get("OPENAI_API_KEY"),
-)
-
 def get_embedding_function():
     # Set the API key either from environment variable or directly
     api_key = os.getenv('OPENAI_API_KEY', openaiapi) 
