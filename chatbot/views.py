@@ -23,13 +23,11 @@ from django.contrib.auth.decorators import login_required
 
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
-openaiapi = openai.api_key=os.getenv("OPENAI_API_KEY")
-
+openai.api_key=os.getenv("OPENAI_API_KEY")
+openaiapi = os.getenv("OPENAI_API_KEY")
 
 CHROMA_PATH = "chroma.db"
 
-
-# openai.api_key = openaiapi
 
 client = openai.OpenAI(
     api_key = os.environ.get("OPENAI_API_KEY"),
@@ -113,7 +111,7 @@ def ask_openai(message, chat_id):
     db = Chroma(persist_directory=chat_db_directory, embedding_function=embedding_function)
     context = db.similarity_search_with_score(message, k=5)
 
-    response = client.chat.completions.create(
+    response = openai.chat.completions.create(
         model = "gpt-4o-mini",
         messages=[
             {"role": "system", "content": f"Provide a response to the following message:{message} based on following context:{context}"},
@@ -146,7 +144,7 @@ def start_chat(request):
     if request.method == 'POST':
         message = request.POST.get('message')
 
-        response = client.chat.completions.create(
+        response = openai.chat.completions.create(
             model = "gpt-4o-mini",
             messages=[
                 {'role': "system", 'content': f"You are usefull assistant, write an answer to the following message: {message} and create a name for a chat based on this first message, without "" or anything like that: '{message}', write it in the following format: Answer: <answer>, Name: <name>"}
