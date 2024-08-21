@@ -29,10 +29,11 @@ openaiapi = openai.api_key=os.getenv("OPENAI_API_KEY")
 CHROMA_PATH = "chroma.db"
 
 
-openai.api_key = openaiapi
-client = openai.Client(api_key="your-api-key-here")
+# openai.api_key = openaiapi
 
-
+client = openai.OpenAI(
+    api_key = os.environ.get("OPENAI_API_KEY"),
+)
 
 def get_embedding_function():
     # Set the API key either from environment variable or directly
@@ -145,7 +146,7 @@ def start_chat(request):
     if request.method == 'POST':
         message = request.POST.get('message')
 
-        response = openai.chat.completions.create(
+        response = client.chat.completions.create(
             model = "gpt-4o-mini",
             messages=[
                 {'role': "system", 'content': f"You are usefull assistant, write an answer to the following message: {message} and create a name for a chat based on this first message, without "" or anything like that: '{message}', write it in the following format: Answer: <answer>, Name: <name>"}
