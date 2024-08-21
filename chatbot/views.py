@@ -4,6 +4,7 @@ import openai
 
 from django.contrib import auth
 from django.contrib.auth.models import User
+import openai.cli
 from .models import Chat
 from django.utils import timezone
 
@@ -29,6 +30,8 @@ CHROMA_PATH = "chroma.db"
 
 
 openai.api_key = openaiapi
+client = openai.Client(api_key="your-api-key-here")
+
 
 
 def get_embedding_function():
@@ -109,7 +112,7 @@ def ask_openai(message, chat_id):
     db = Chroma(persist_directory=chat_db_directory, embedding_function=embedding_function)
     context = db.similarity_search_with_score(message, k=5)
 
-    response = openai.chat.completions.create(
+    response = client.chat.completions.create(
         model = "gpt-4o-mini",
         messages=[
             {"role": "system", "content": f"Provide a response to the following message:{message} based on following context:{context}"},
