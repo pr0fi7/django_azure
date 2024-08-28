@@ -1,22 +1,124 @@
 {% extends 'base.html' %}
 
+{% block styles %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .chat-list-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        max-width: 600px;
+        width: 100%;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 24px;
+    }
+
+    .search-bar {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    .search-bar input {
+        width: 80%;
+        padding: 10px;
+        border: 1px solid #d9d9d9;
+        border-radius: 5px;
+        font-size: 16px;
+        outline: none;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    li {
+        margin-bottom: 15px;
+        transition: background-color 0.3s;
+    }
+
+    li a {
+        display: block;
+        padding: 15px 20px;
+        text-decoration: none;
+        color: #fff;
+        background-color: #1E1E1E; /* Matching dark color */
+        border-radius: 5px;
+        font-size: 18px;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    li a:hover {
+        background-color: #333; /* Slightly lighter on hover */
+        transform: translateY(-2px);
+        color: #fff;
+    }
+
+    li a:active {
+        background-color: #000; /* Darker on active */
+        transform: translateY(0);
+    }
+
+    .no-chats {
+        text-align: center;
+        color: #666;
+        font-size: 18px;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Your Chats</h2>
+<div class="chat-list-container">
+    <h2>Your Chats</h2>
 
-{% if chats %}
-    <ul>
-    {% for chat in chats %}
-        <li><a href="{% url 'chatbot' chat.chat_id|urlencode %}">{{ chat.chat_id }}</a></li>
-    {% endfor %}
-    
-    </ul>
-{% else %}
-    <p>You have no chats.</p>
-{% endif %}
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search chats...">
+    </div>
 
-<form action="{% url 'create_chat' %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Create New Chat</button>
-</form>
+    {% if chats %}
+        <ul id="chatList">
+        {% for chat in chats %}
+            <li class="chat-item"><a href="{% url 'chatbot' chat.chat_id|urlencode %}">{{ chat.chat_id }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-chats">You have no chats.</p>
+    {% endif %}
+</div>
 
+<script>
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const chatItems = document.querySelectorAll('.chat-item');
+
+        chatItems.forEach(function(item) {
+            const chatId = item.textContent.toLowerCase();
+            if (chatId.includes(searchTerm)) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+</script>
 {% endblock %}
