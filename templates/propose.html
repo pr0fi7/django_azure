@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+
+{% block styles %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f7f7f7;
+    }
+
+    .container {
+        width: 80%;
+        margin: 50px auto;
+    }
+
+    h1 {
+        font-size: 24px;
+        font-weight: normal;
+        margin-bottom: 10px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        margin-bottom: 20px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    thead {
+        background-color: #f7f7f7;
+        border-bottom: 2px solid #007BFF;
+    }
+
+    thead th {
+        text-align: left;
+        padding: 12px 15px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #ddd;
+    }
+
+    tbody td {
+        padding: 12px 15px;
+        font-size: 14px;
+        color: #555;
+    }
+
+    tbody td a {
+        text-decoration: none;
+        color: #333;
+    }
+
+    tbody td i {
+        cursor: pointer;
+        padding: 5px;
+        color: #333;
+    }
+
+    tbody td i:hover {
+        color: #007BFF;
+    }
+
+    .departments {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .department-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 180px;
+        padding: 15px;
+        background-color: #f7f7f7;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .department-option.active {
+        background-color: #e8f4e1;
+        border-color: #007BFF;
+    }
+
+    .department-option:hover {
+        background-color: #f0f0f0;
+    }
+
+    .department-option .checkmark {
+        font-size: 18px;
+        display: none;
+    }
+
+    .department-option.active .checkmark {
+        display: block;
+        color: #007BFF;
+    }
+
+    .buttons-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .buttons-container button {
+        background-color: #ddd;
+        color: #333;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .buttons-container button:hover {
+        background-color: #ccc;
+    }
+
+    .footer {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 12px;
+        color: #777;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Include the navbar -->
+    {% include 'navbar.html' %}
+    <body>
+
+        <div class="container">
+            <h1>Documents Allocation</h1>
+        
+            <!-- Table showing selected document -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Documents</th>
+                        <th>Date</th>
+                        <th>Submitted by</th>
+                        <th>Last update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="#">Car_policy.pdf</a></td>
+                        <td>12/01/2024</td>
+                        <td>John Doe</td>
+                        <td><i class="fas fa-eye"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+        
+            <!-- Department selection -->
+            <div class="departments">
+                <div class="department-option active" onclick="toggleSelection(this)">
+                    <span>All company</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="department-option" onclick="toggleSelection(this)">
+                    <span>R&D</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="department-option" onclick="toggleSelection(this)">
+                    <span>Manufacturing</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="department-option" onclick="toggleSelection(this)">
+                    <span>Marketing</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="department-option" onclick="toggleSelection(this)">
+                    <span>Sales</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="department-option" onclick="toggleSelection(this)">
+                    <span>HR</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="department-option" onclick="toggleSelection(this)">
+                    <span>Compliance</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="department-option" onclick="toggleSelection(this)">
+                    <span>Finance</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+            </div>
+        
+            <!-- Buttons at the bottom -->
+            <div class="buttons-container">
+                <button>Select All</button>
+                <button>Add a Department</button>
+            </div>
+        
+            <div class="footer">
+                <p>Footer: Version number: premvp 1.0 - supported files: zip, xls, txt, doc, pdf, ppt, jpg, png...</p>
+            </div>
+        </div>
+        
+        </body>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function toggleSelection(element) {
+        element.classList.toggle('active');
+    }
+</script>
+{% endblock %}

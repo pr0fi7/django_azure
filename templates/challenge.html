@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Create Challenge
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Create a New Challenge</h2>
+    <form id="challengeForm" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required placeholder="Enter Challenge Title">
+        </div>
+
+        <div class="form-group">
+            <label for="why">Why (Purpose)</label>
+            <textarea class="form-control" id="why" name="why" rows="3" placeholder="Explain the purpose of this challenge"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="4" placeholder="Provide a detailed description"></textarea>
+        </div>
+
+        <!-- Dropdown for Challenge Type -->
+        <div class="form-group">
+            <label for="challenge_type">Challenge Type</label>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="challengeTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select Challenge Type
+                </button>
+                <div class="dropdown-menu" aria-labelledby="challengeTypeDropdown">
+                    <a class="dropdown-item" href="#" onclick="selectChallengeType('OPENAI')">OPENAI</a>
+                    <a class="dropdown-item" href="#" onclick="selectChallengeType('OLLAMA')">OLLAMA</a>
+                    <a class="dropdown-item" href="#" onclick="selectChallengeType('LLM 3')">LLM 3</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="participants">Participants</label>
+            <input type="text" class="form-control" id="participants" name="participants" placeholder="List participants (e.g., user1, user2)">
+        </div>
+
+        <div class="form-group">
+            <label for="reward">Reward</label>
+            <input type="text" class="form-control" id="reward" name="reward" placeholder="Specify the reward for the challenge">
+        </div>
+
+        <!-- Dropdown for Tracking Method -->
+        <div class="form-group">
+            <label for="tracking_method">Tracking Method</label>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="trackingMethodDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select Tracking Method
+                </button>
+                <div class="dropdown-menu" aria-labelledby="trackingMethodDropdown">
+                    <a class="dropdown-item" href="#" onclick="selectTrackingMethod('OPENAI')">OPENAI</a>
+                    <a class="dropdown-item" href="#" onclick="selectTrackingMethod('OLLAMA')">OLLAMA</a>
+                    <a class="dropdown-item" href="#" onclick="selectTrackingMethod('LLM 3')">LLM 3</a>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success" id="CreateChallengeButton">Create Challenge</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .container {
+        max-width: 800px;
+        margin: auto;
+    }
+    h2 {
+        margin-bottom: 30px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    document.getElementById('CreateChallengeButton').addEventListener('click', function(event) {
+        event.preventDefault();  // Prevent default form submission
+        const form = document.getElementById('challengeForm');
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(`/challenges/`, {  // Correct URL with trailing slash
+            method: 'POST',  // Ensure it's a POST request
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken  // Ensure CSRF token is sent
+            },
+            body: JSON.stringify({
+                title: form.title.value,
+                why: form.why.value,
+                description: form.description.value,
+                challenge_type: selectedChallengeType,
+                participants: form.participants.value,
+                reward: form.reward.value,
+                tracking_method: selectedTrackingMethod
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert('Challenge Created Successfully!');
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+
+</script>
+{% endblock %}

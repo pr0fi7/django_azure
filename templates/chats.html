@@ -57,25 +57,52 @@
     }
 
     li a {
-        display: block;
-        padding: 15px 20px;
+        flex-grow: 1;
         text-decoration: none;
         color: #fff;
-        background-color: #1E1E1E; /* Matching dark color */
-        border-radius: 5px;
+        background-color: #1E1E1E;
         font-size: 18px;
-        transition: background-color 0.3s, transform 0.3s;
     }
 
     li a:hover {
-        background-color: #333; /* Slightly lighter on hover */
-        transform: translateY(-2px);
-        color: #fff;
+        color: #000;
+        background-color: #333;
     }
 
-    li a:active {
-        background-color: #000; /* Darker on active */
+    .chat-item:hover,
+    .chat-item:hover a {
+        background-color: #333;
+        transform: translateY(-2px);
+        color: #000;
+    }
+
+    .chat-item a {
+        color: #fff;
+        flex-grow: 1;
+        text-decoration: none;
+        transition: color 0.3s, background-color 0.3s;
+    }
+
+    .chat-item:active {
+        background-color: #000;
         transform: translateY(0);
+    }
+
+    .icons {
+        display: flex;
+        gap: 15px;
+        margin-left: auto;
+        font-size: 20px;
+    }
+
+    .icons i {
+        color: #fff;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .icons i:hover {
+        color: #000;
     }
 
     .no-chats {
@@ -83,6 +110,48 @@
         color: #666;
         font-size: 18px;
         margin-top: 20px;
+    }
+
+    .chat-item {
+        display: flex;
+        align-items: center;
+        background-color: #1E1E1E;
+        padding: 15px;
+        border-radius: 5px;
+        position: relative;
+    }
+
+    .input_bar {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 5px;
+        padding: 10px;
+        z-index: 1000;
+    }
+
+    .input_bar input {
+        width: 90%;
+        height: 30px;
+        font-size: 16px;
+        padding: 5px;
+    }
+
+    .close-input-bar {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        cursor: pointer;
+        font-size: 20px;
+        color: #333;
+    }
+
+    .hidden {
+        display: none;
     }
 </style>
 {% endblock %}
@@ -98,7 +167,25 @@
     {% if chats %}
         <ul id="chatList">
         {% for chat in chats %}
-            <li class="chat-item"><a href="{% url 'chatbot' chat.chat_id|urlencode %}">{{ chat.chat_id }}</a></li>
+            <li class="chat-item">
+                <a href="{% url 'chatbot' chat.chat_id|urlencode %}">{{ chat.chat_id }}</a>
+                <div class="icons">
+                    <i class="fa-solid fa-trash-can delete_chat" data-chat-id="{{ chat.chat_id }}">
+                        {% csrf_token %}
+                    </i>
+                    <i class="fa-solid fa-pen-to-square edit_chat" data-chat-id="{{ chat.chat_id }}">
+                        {% csrf_token %}
+                    </i>
+                </div>
+
+                <form class="message-form" method="post" data-chat-id="{{ chat_id }}">
+                    {% csrf_token %}
+                    <div class="input_bar">
+                        <input type="text" class="form-control" value="{{ chat.chat_id }}" placeholder="Edit chat name...">
+                        <i class="fa-solid fa-times close-input-bar"></i> <!-- Close button -->
+                    </div>
+                </form> <!-- End of message form -->
+            </li>
         {% endfor %}
         </ul>
     {% else %}
@@ -107,12 +194,38 @@
 </div>
 
 <script>
+
+document.querySelectorAll('.delete_chat').forEach(function(deleteBtn) {
+    deleteBtn.addEventListener('click', function(event) {
+        event.stopPropagation();  // Prevents triggering the parent li click event
+        event.preventDefault();   // Prevents the default action of the link
+
+        const chatId = this.getAttribute('data-chat-id');
+        fetch(`/chatbot/${chatId}/clear_all/`, {  // Removed the comma, and correctly passing the options object
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                window.location.reload();  // Reload page on success
+            } else {
+                alert('Failed to clear chat: ' + data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+
     document.getElementById('searchInput').addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
         const chatItems = document.querySelectorAll('.chat-item');
 
         chatItems.forEach(function(item) {
-            const chatId = item.textContent.toLowerCase();
+            const chatId = item.querySelector('a').textContent.toLowerCase();
             if (chatId.includes(searchTerm)) {
                 item.style.display = '';
             } else {
@@ -120,5 +233,61 @@
             }
         });
     });
+
+    // Handling the edit chat functionality
+    document.querySelectorAll('.edit_chat').forEach(function(editBtn) {
+        editBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            event.preventDefault();
+
+            const chatItem = this.closest('.chat-item');
+            const inputBar = chatItem.querySelector('.input_bar');
+
+            // Hide icons when the input bar is active
+            chatItem.querySelector('.icons').style.display = 'none';
+            inputBar.style.display = 'block'; // Show input bar
+
+            document.querySelector('.message-form').addEventListener('submit', function (event) {
+                event.preventDefault();
+                const newName = inputBar.querySelector('input').value;
+                const chatId = editBtn.getAttribute('data-chat-id');
+                sendNewName(chatId, newName);
+            });
+        });
+    });
+
+    // Handling the close input bar functionality
+    document.querySelectorAll('.close-input-bar').forEach(function(closeBtn) {
+        closeBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+
+            const inputBar = this.closest('.input_bar');
+            const chatItem = this.closest('.chat-item');
+
+            // Show icons when input bar is closed
+            chatItem.querySelector('.icons').style.display = 'flex';
+            inputBar.style.display = 'none'; // Hide input bar
+        });
+    });
+
+    function sendNewName(chatId, newName) {
+        fetch(`/chatbot/${chatId}/edit_name/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: new URLSearchParams({ 'new_name': newName })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                window.location.reload();
+            } else {
+                alert('Failed to edit chat: ' + data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
 </script>
 {% endblock %}

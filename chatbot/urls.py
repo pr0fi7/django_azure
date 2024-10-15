@@ -10,5 +10,10 @@ urlpatterns = [
     path('start-chat', views.start_chat, name='start_chat'),
     path('chatbot/<str:chat_id>/clear_chat/', views.clear_chat, name='clear_chat'),
     path('chatbot/<str:chat_id>/clear_all/', views.clear_all, name='clear_all'),
-
+    path('propose', views.propose, name='propose'),
+    path('validated', views.validated, name='validated'),
+    path('to_validate', views.to_validate, name='to_validate'),
+    path('users', views.users, name='users'),
+    path('chatbot/<str:chat_id>/edit_name/', views.edit_chat_name, name='edit_chat_name'),
+    
     ]

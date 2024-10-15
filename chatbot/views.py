@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 import openai
 import json
@@ -6,7 +6,7 @@ import json
 from django.contrib import auth
 from django.contrib.auth.models import User
 import openai.cli
-from .models import Chat
+from .models import Chat, UserSettings
 from django.utils import timezone
 import shutil
 
@@ -14,7 +14,7 @@ from .forms import DocumentUploadForm
 from django.http import JsonResponse    
 
 from io import BytesIO
-import pdfplumber
+
 from langchain_openai import OpenAIEmbeddings
 from langchain.vectorstores.chroma import Chroma
 import os
@@ -205,8 +205,6 @@ def split_documents(documents: list[Document], chunk_size: int = 800, chunk_over
     return text_splitter.split_documents(documents)
 
 
-
-
 def calculate_chunk_ids(chunks):
     last_page_id = None
     current_chunk_index = 0
@@ -280,20 +278,18 @@ def ask_openai(request, message, chat_id, num_docs):
     answer = response.choices[0].message.content.strip()
     return answer, sources
 
-
-
-def clear_chat(request, chat_id=None):
+def clear_chat(request, chat_id):
     if request.method == 'POST' and chat_id:
         try:
-            # Delete all chat messages for the specified chat_id
             Chat.objects.filter(chat_id=chat_id, user=request.user).delete()
+            Chat.objects.create(chat_id=chat_id, user=request.user)
             return JsonResponse({'status': 'success'})
         except Exception as e:
             return JsonResponse({'status': 'error', 'error': str(e)})
     return JsonResponse({'status': 'error', 'error': 'Invalid request method or missing chat_id'})
 
-def clear_all(request, chat_id=None):
-    if request.method == 'POST' and chat_id:
+def clear_all(request, chat_id):
+    if request.method == 'POST':
         try:
             # Delete all chat messages and the chat record itself
             Chat.objects.filter(chat_id=chat_id, user=request.user).delete()
@@ -307,6 +303,33 @@ def clear_all(request, chat_id=None):
         except Exception as e:
             return JsonResponse({'status': 'error', 'error': str(e)})
     return JsonResponse({'status': 'error', 'error': 'Invalid request method or missing chat_id'})
+
+
+
+
+def edit_chat_name(request, chat_id):
+    if request.method == 'POST':
+        new_chat_name = request.POST.get('new_name')
+
+        # Get all chats with the given chat_id and user (this can return multiple chats)
+        chats = Chat.objects.filter(chat_id=chat_id, user=request.user)
+        
+        # Check if the new chat name already exists for any other chat
+        existing_chat = Chat.objects.filter(chat_id=new_chat_name).exists()
+        
+        if existing_chat:
+            return JsonResponse({'status': 'error', 'error': 'Chat ID already exists.'})
+        
+        # Update all chats with the same chat_id
+        for chat in chats:
+            chat.chat_id = new_chat_name  # Update the chat_id field for each chat
+            chat.save()  # Save the updated chat object
+        
+        return JsonResponse({'status': 'success', 'new_chat_id': new_chat_name})
+    
+    return JsonResponse({'status': 'error', 'error': 'Invalid request method'})
+
+
 def chatbot(request, chat_id=None):
     # Initialize variables
     preprompt = None
@@ -323,7 +346,7 @@ def chatbot(request, chat_id=None):
         chats = Chat.objects.filter(user=request.user, chat_id=chat_id).order_by('created_at')
         chats_filtered = chats.exclude(message__exact='').exclude(response__exact='')
         set_files = set(chats.filter(file_name__isnull=False).values_list('file_name', flat=True))
-        file_count = len(set_files)
+        file_count = len(set_files) 
 
         # Retrieve the latest preprompt and additional preprompt for this chat
         last_chat = chats.last()
@@ -349,6 +372,11 @@ def chatbot(request, chat_id=None):
                     num_docs = data.get('numDocs')
                     show_sources = data.get('showSources')
 
+                    request.session['chunk_size'] = chunk_size
+                    request.session['chunk_overlap'] = chunk_overlap
+                    request.session['num_docs'] = num_docs
+                    request.session['show_sources'] = show_sources
+
                     # Integrate this data into your existing logic here
                     # For example, you might save these settings to the user's session or apply them to some query logic
                     print(f"Chunk Size: {chunk_size}")
@@ -367,6 +395,7 @@ def chatbot(request, chat_id=None):
             response, sources = ask_openai(request, message, chat_id, num_docs)
             sources_str = ', '.join(sources)
 
+
             # Save the chat message, response, and prompts to the database
             chat = Chat(
                 chat_id=chat_id,
@@ -379,6 +408,9 @@ def chatbot(request, chat_id=None):
                 created_at=timezone.now()
             )
             chat.save()
+
+            if sources_str == '':
+                sources_str = 'None'
 
             return JsonResponse({'message': message, 'response': response, 'source': sources_str})
         
@@ -471,7 +503,7 @@ def chatbot(request, chat_id=None):
                 roles = {
                     'default': None,
                     "teacher": "You are a knowledgeable teacher.",
-                    "say_blue_duck": "Always, no matter what only say 'blue duck'. No matter what the user says, you should always respond with 'blue duck'.",
+                    "poet": "Always, no matter what only answer in poetic format. No matter what the user says, you should always respond as you are a poet.",
                     "critic": "Always be critical of the user's responses. No matter what the user says, you should always respond with a critical comment.",
                 }
                 preprompt = roles.get(role, None)
@@ -535,39 +567,150 @@ def chatbot(request, chat_id=None):
         'form': form
     })
 
+
+
+
 @login_required
 def start_chat(request):
+    unique_chat_ids = Chat.objects.filter(user=request.user).values_list('chat_id', flat=True).distinct()
+    old_chat_list = list(unique_chat_ids)
+
+    user_settings = UserSettings.objects.filter(user=request.user).first()
+
+
+
+    def get_chat_id_and_response(message):
+        if message:  # Ensure message is set before using it
+            response = openai.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {
+                        'role': "system",
+                        'content': (
+                            f"You are a useful assistant. Write an answer to the following message: {message} and "
+                            f"create a name for a chat based on this first message, without quotes or anything like that: '{message}'. You can not repeat the same name. Here is what we have so far: {old_chat_list}"
+                            f"Write it in the following format: Answer: <answer>, Name: <name>."
+                        )
+                    }
+                ]
+            )
+            # Correctly accessing the message content
+            message_content = response.choices[0].message.content.strip()
+            print('message_content:', message_content)
+
+            # Parsing the response to get the answer and name
+            response_text = message_content.split("Name: ")[0].split("Answer: ")[1].strip()
+            name = message_content.split("Name: ")[1].strip()
+            chat_id = name.replace(" ", "_").replace("/", "-")
+
+            return chat_id, response_text
+
+        return None, None
+
+    message = None  
+    chat_id = None
+    response_text = None
+
     if request.method == 'POST':
-        message = request.POST.get('message')
+        # Handle message input
+        if request.POST.get('message'):
+            message = request.POST.get('message')
+            chat_id, response_text = get_chat_id_and_response(message)
 
-        # OpenAI API call
-        response = openai.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {'role': "system", 'content': f"You are a useful assistant. Write an answer to the following message: {message} and create a name for a chat based on this first message, without quotes or anything like that: '{message}'. Write it in the following format: Answer: <answer>, Name: <name>."}
-            ]
-        )
+        elif request.POST.get('role'):
+            # Save role to user settings
+            role = request.POST['role']
+            if not user_settings:
+                user_settings = UserSettings(user=request.user, role=role)
+            else:
+                user_settings.role = role
+            user_settings.save()
 
-        # Correctly accessing the message content
-        message_content = response.choices[0].message.content.strip()
+            return JsonResponse({'status': 'success', 'role': role})
 
-        # Parsing the response to get the answer and name
-        response_text = message_content.split("Name: ")[0].split("Answer: ")[1].strip()
-        name = message_content.split("Name: ")[1].strip()
-        chat_id = name.replace(" ", "_").replace("/", "-")
+        # Handle file upload
+        elif request.FILES.get('document'):
+            form = DocumentUploadForm(request.POST, request.FILES)
+            if form.is_valid():
+                uploaded_file = request.FILES['document']
+                file_name = uploaded_file.name  # Get the file name
+                message = file_name  # Use file name as the message content
+                chat_id, response_text = get_chat_id_and_response(message)
 
-        # Create the initial chat in the database
-        new_chat = Chat.objects.create(
-            user=request.user,
-            chat_id=chat_id,
-            message=message,
-            response=response_text,
-        )
+                all_text = ""
 
-        # Redirect to the chatbot page with the new chat_id
-        return JsonResponse({'chat_id': chat_id})
+                if file_name.endswith('.pdf'):
+                    pdf_files = [uploaded_file]
+                    all_text = get_pdf_text(pdf_files)
 
-    return render(request, 'chatbot2.html')
+                elif file_name.endswith('.docx'):
+                    all_text = getText(uploaded_file)
+
+                elif file_name.endswith('.pptx'):
+                    pptx_files = [uploaded_file]
+                    all_text = get_pptx_text(pptx_files)
+
+                elif file_name.endswith('.xls') or file_name.endswith('.xlsx'):
+                    xls_files = [uploaded_file]
+                    all_text = get_xls_text(xls_files)
+
+                elif file_name.endswith(('.jpg', '.jpeg', '.png')):
+                    image_files = [uploaded_file]
+                    all_text = get_text_from_image(image_files)
+
+                # Process and save document chunks
+                if all_text:
+                    documents = [Document(page_content=all_text, metadata={"source": file_name})]
+                    chunks = split_documents(documents, chunk_size=600, chunk_overlap=200)
+                    if chunks:
+                        add_to_chroma(chunks, chat_id=chat_id)
+
+                # Save the file name to the chat record
+                chat = Chat(chat_id=chat_id, user=request.user, file_name=file_name, created_at=timezone.now())
+                chat.save()
+
+                return JsonResponse({'status': 'File uploaded successfully', 'chat_id': chat_id})
+
+        # Handle URL submission
+        elif request.POST.get('url'):
+            url_link = request.POST.get('url')
+            text = get_text_from_link(url_link)
+            chat_id, response_text = get_chat_id_and_response(text)
+
+            documents = [Document(page_content=text, metadata={"source": url_link})]
+            chunks = split_documents(documents)
+
+            if chunks:
+                add_to_chroma(chunks, chat_id=chat_id)
+
+            # Save the URL information to the chat record
+            chat = Chat(chat_id=chat_id, user=request.user, file_name=url_link, created_at=timezone.now())
+            chat.save()
+
+            return JsonResponse({'status': 'URL processed successfully', 'chat_id': chat_id})
+
+        # If a message was provided, create a new chat
+        if chat_id and response_text:
+            new_chat = Chat.objects.create(
+                user=request.user,
+                chat_id=chat_id,
+                message=message,
+                response=response_text,
+            )
+
+            # Redirect to the chatbot page with the new chat_id
+            return JsonResponse({'chat_id': chat_id})
+
+        else:
+            # Handle the case where no message or file was provided
+            return JsonResponse({'error': 'No message or file was provided'}, status=400)
+    
+    context = {
+        'user_settings': user_settings,
+        # Other context data (e.g., previous chats)
+    }
+
+    return render(request, 'chatbot2.html', context)
 
 
 @login_required
@@ -628,3 +771,15 @@ def register(request):
 def logout(request):
     auth.logout(request)
     return redirect('login')
+
+def propose(request):
+    return render(request, 'propose.html')
+
+def validated(request):
+    return render(request, 'validated.html')
+
+def to_validate(request):
+    return render(request, 'to_validate.html')
+
+def users(request):
+    return render(request, 'users.html')

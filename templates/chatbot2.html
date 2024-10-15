@@ -29,6 +29,33 @@ body {
     height: 100vh;
 }
 
+.propose_file {
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #1E1E1E;
+    text-align: center;
+    width: 100%;
+    padding: 10px;
+    margin-top: auto; /* This pushes the button to the bottom */
+}
+
+.sidebar_right_down {
+    display: flex;
+    margin-top: auto;
+}
+.file_form {
+    width: 100%;    
+    padding: 10px;
+}
+
+.fie_form_sub {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
 .sidebar-content {
     display: flex;
     flex-direction: column;
@@ -158,6 +185,53 @@ button.active {
     margin: 5px; /* Add a small margin between elements */
 }
 
+.input-container_url {
+    width: 100%;
+    position: relative;
+    display: inline-block; /* Ensure the spinner stays aligned with the input */
+}
+
+#rag_url_link {
+    padding-right: 30px; /* Add padding to avoid text overlapping the spinner */
+    width: 100%; /* Optional: Adjust width as needed */
+}
+
+.spinner_link {
+    position: absolute;
+    top: 40%;
+    right: 10px; /* Position the spinner at the right side of the input */
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner_file {
+    z-index: 1000;
+    margin-right: -25vh;
+    margin-top: -3.5vh;
+    font-size: 20px;
+}
+
+.message_spinner {
+    font-size: 20px;
+    z-index: 1000;
+    position: relative; /* Relative to its normal position */
+    top: -30px; /* Moves it 10px up */
+}
+
+
+
+.hidden {
+    display: none;
+}
+.blind {
+    opacity: 0;
+}
+
+
+
+
 .controls button {
     margin: 0;
 }
@@ -208,6 +282,7 @@ button.active {
     width: 50%;
     padding: 7px;
 }
+
 
 .context_files_indicator {
     display: flex;
@@ -346,12 +421,22 @@ button.active {
     width: 100%;
 
 }
+.rag_url_link{
+    background-color: #fff;
+    border: 1px solid #D9D9D9;
+    color: #B3B3B3;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 140px;
+
+}
 
 .file-label {
+    padding:10px;
+
     display: inline-block;
-    padding: 10px;
-    padding-left: 55px;
-    padding-right: 55px;
+    padding-left: 62px;
+    padding-right: 62px;
+
     border-radius: 8px;
     background-color: #fff;
     border: 1px solid #D9D9D9;
@@ -360,6 +445,9 @@ button.active {
     text-align: center;
     transition: background-color 0.3s, color 0.3s;
     margin-bottom: 10px;
+    align-items: center;
+
+    width: 100%; 
 }
 
 .file-label:hover {
@@ -467,6 +555,8 @@ button.active {
 .input-container i:hover {
     color: #000; /* Darken on hover */
 }
+
+
 .message-content {
     border: 0px solid #d9d9d9;
     border-radius: 5px;
@@ -572,28 +662,39 @@ button.active {
 }
 
 .modal_expert {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 100; /* Sit on top */
+    visibility: hidden; /* Hidden initially */
+    position: fixed; 
+    z-index: 100;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
-    
+    width: 100%; 
+    height: 100%; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5); 
+    transition: visibility 0s, opacity 0.3s ease;
+    opacity: 0; /* Add opacity transition for fade-in effect */
 }
 
-/* Modal Content */
+.modal_expert.show {
+    visibility: visible; /* Show the modal */
+    opacity: 1; /* Apply opacity to show the modal */
+}
+
+
+
 .modal-content_expert {
     background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
     padding: 20px;
     border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size */
+    width: 80%;
     max-width: 500px;
+    max-height: 80vh; /* Ensure modal content doesn't exceed 80% of viewport height */
+    overflow-y: auto; /* Allow scrolling within modal if content is too long */
     border-radius: 8px;
 }
+
 
 /* Close Button */
 .close {
@@ -667,6 +768,7 @@ button#saveExpertFeatures:hover {
 .icons {
     display: flex;
     gap: 8px; /* Adjust the gap between icons as needed */
+    margin-left: 10px;
 }
 
 .message-sender b {
@@ -684,7 +786,32 @@ button#saveExpertFeatures:hover {
 
 }
 
-  </style>
+.go_up_container {
+    position: fixed;
+    bottom: 20px; /* Positioned at the bottom */
+    right: 20px;  /* Positioned at the right */
+    z-index: 1000;
+    display: none; /* Hidden by default */
+}
+
+.go_up_arrow {
+    font-size: 40px;
+    color: #1E1E1E;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    padding: 10px;
+    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.go_up_arrow:hover {
+    background-color: #333; /* Change color on hover */
+    color: #fff;
+}
+
+
+</style>
 {% endblock %}
 
 
@@ -696,23 +823,32 @@ button#saveExpertFeatures:hover {
         </div>
 
         <hr class="divider">
-
+        
         <div class="rag_url">
-            <input id = 'rag_url_link' type="text" placeholder="RAG me this URL">
+            <div class="input-container_url">
+                <input id="rag_url_link" type="text" placeholder="RAG me this URL">
+                <div id="loadingSpinnerUrl" class="spinner_link hidden">
+                    <!-- FontAwesome spinner -->
+                    <i class="fa fa-spinner fa-spin" style="font-size:20px;"></i>
+                </div>
+            </div>
         </div>
-        {% if chat_id %}
-            <form id="ragForm" method="post" enctype="multipart/form-data" action="{% url 'chatbot' chat_id %}">
-                {% csrf_token %}
-                <label for="myFile" class="file-label">
-                    RAG me this file <i class="fa-solid fa-cloud-arrow-down"></i>
-                    <input class="rag_me" type="file" id="myFile" name="document" required />
-                </label>
-            </form>
-        {% endif %}
+        
+
+        <form id="ragForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="myFile" class="file-label">
+                    RAG this file <i class="fa-solid fa-cloud-arrow-down"></i>
+                    <input class="rag_me" type="file" id="myFile" name="document" multiple required />
+                    <div id="loadingSpinnerDocument" class="spinner_file blind">
+                        <i class="fa fa-spinner fa-spin"></i>
+                    </div>
+            </label>
+        </form>
 
         
 
-        <div class="context_files_indicator">Number of files in context:
+        <div class="context_files_indicator">Number of items in context:
 
         {% if file_count > 0 %}
         {{ file_count }}
@@ -742,7 +878,6 @@ button#saveExpertFeatures:hover {
 
 <div id="expertFeaturesModal" class="modal_expert">
     <div class="modal-content_expert">
-        <span class="close close_expert">&times;</span>
         <h2>Expert Features</h2>
         
         <div class="form-group">
@@ -779,49 +914,47 @@ button#saveExpertFeatures:hover {
 
 <div class="chat-container">
     <div class="logo">
-        <img src="https://i.postimg.cc/nhzYS0J2/logo.png">
-    </div>
+        <img src="https://i.ibb.co/pP4S9Dw/Vector-1.png">
+    </div>  
 
     <div class="controls">
 
         <div class="dropdown">
-            <button class="act_as">Act as: <i class="arrow down"></i></button>
+            <button class="act_as">Act as: {{ user_settings.role|default:"default" }} <i class="arrow down"></i></button>
             <div class="dropdown-content">
                 <a href="#" class="default" data-role="default">Default</a>
                 <a href="#" class="teacher" data-role="teacher">Teacher</a>
-                <a href="#" class="say_blue_duck" data-role="say_blue_duck">Say blue duck</a>
+                <a href="#" class="poet" data-role="poet">Poet</a>
                 <a href="#" class="critic" data-role="critic">Critic</a>
                 <a href="#" class="other" data-role="other" id="customRole">Other</a>
             </div>
         </div>
         
+        
         <!-- Modal Structure -->
         <div id="customRoleModal" class="modal">
             <div class="modal-content">
-                <span class="close">&times;</span>
                 <h2>Custom Role</h2>
                 <textarea id="customRoleInput" rows="4" cols="50" placeholder="Describe your custom role..."></textarea>
                 <button id="submitCustomRole">Submit</button>
             </div>
         </div>
-        
-        
 
         <div class="creativity">
             <div class="creativity_button">Be creative</div>
-            <h6>0-100</h6>
+            <h6 id="CreativityValue">0-100%</h6>
             <input type="range" min="1" max="100" value="50" class="slider creativity" id="creativitySlider">
         </div>
 
         <div class="short-answers">
-            <button id="short_answers">Short answers</button>
-            <h6>1-25 lines</h6>
+            <button id="short_answers">Reply length </button>
+            <h6 id='ShortAnswersValue'>1-25 lines</h6>
             <input type="range" min="1" max="25" value="12.5" class="slider" id="shortAnswersSlider">
         </div>
         
         <div class="bullet-points">
             <button id="bullet_points">Bullet points only</button>
-            <h6>1-10 points</h6>
+            <h6 id="BulletPointsValue">1-10 points</h6>
             <input type="range" min="1" max="10" value="5.5" class="slider" id="bulletPointsSlider">
         </div>
         
@@ -832,7 +965,11 @@ button#saveExpertFeatures:hover {
         <div class="input_bar">
             <div class="input-container">
                 <input type="text" class="form-control message-input" placeholder="Type your message...">
+                <div id="loadingSpinnerMessage" class="message_spinner hidden">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </div>
                 <i class="fa-regular fa-paper-plane" id="sendMessageButton"></i>
+
             </div>
         </div>
     </form> 
@@ -855,15 +992,20 @@ button#saveExpertFeatures:hover {
                         </div>
                         <div class="message-content">
                             {{ chat.response }}
-
                         </div>
                     </div>
+                    <li>
+                        <div class="message-sources">
+                            {% if chat.source %}
+                                {{ chat.source }}
+                            {% else %}
+                                {{ 'None' }}
+                            {% endif %}
+                        </div>
+                        
+                    </li>
                 </li>
-                <li>
-                    <div class="message-sources">
-                        {{ chat.source }}
-                    </div>
-                </li>
+
                     <li class="message-sent">
                         <div class="message-text">
                             <div class="message-sender">
@@ -888,11 +1030,13 @@ button#saveExpertFeatures:hover {
 
 <div class="sidebar_right">
     <div>
+        {% if user.is_authenticated %}
         <div class="log_in">
             <a href="/login" style="text-decoration: none;">
-                <button style="width: 100%;">Log In</button>
+                <button style="width: 100%;">{{user.username}}(LogOut)</button>
             </a>
         </div>
+        {% endif %}
         <div class="chat_list">
             <a href="/chats" style="text-decoration: none;">
                 <button style="width: 100%;">Chat List</button>
@@ -918,34 +1062,87 @@ button#saveExpertFeatures:hover {
         </div>
     </div>
 
-    
+    <button class="propose_file">
+        Propose File <i class="fa-solid fa-cloud-arrow-down"></i>
+        <input class="rag_me" type="file" id="myFile" name="document" multiple required />
+    </button>
 </div>
+<div class="go_up_container" id="goUpBtn">
+    <i class="fa-solid fa-circle-chevron-up go_up_arrow"></i>
+</div>
+
     <script>
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Select all copy icons
-    const copyIcons = document.getElementById('copyIcon');
 
-    // Add click event listener to each copy icon
-    copyIcons.forEach(function(icon) {
-        icon.addEventListener('click', function() {
-            // Find the closest message-container
-            const messageContainer = icon.closest('.message-container');
+    window.onscroll = function() {
+        scrollFunction();
+    };
 
-            // Get the text content of the message
-            const messageText = messageContainer.querySelector('.message-content').textContent;
+    function scrollFunction() {
+        const goUpButton = document.getElementById('goUpBtn');
+        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+            goUpButton.style.display = "block";
+        } else {
+            goUpButton.style.display = "none";
+        }
+    }
 
-            // Copy the message text to the clipboard
-            navigator.clipboard.writeText(messageText).then(function() {
-                console.log('Message copied to clipboard');
-                // Optionally, you can display a confirmation to the user
+    // When the user clicks on the button, scroll to the top of the document smoothly
+    document.getElementById('goUpBtn').addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    document.querySelector('.propose_file').addEventListener('click', function(event) {
+        window.location.href = '/validated';
+    });
+
+
+
+    // Copy functionality for messages
+    document.querySelector('.messages-list').addEventListener('click', function(event) {
+        if (event.target.matches('.copy')) {
+            const messageContainer = event.target.closest('.message-sent, .message-received');
+            const messageText = messageContainer.querySelector('.message-content').textContent.trim();
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(messageText).then(() => {
                 alert('Message copied to clipboard!');
-            }).catch(function(error) {
-                console.error('Failed to copy text:', error);
+            }).catch(err => {
+                console.error('Failed to copy text:', err);
             });
-        });
+        }
+    });
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Attach an event listener to a parent container of the copy icons
+    const messageContainer = document.querySelector('.messages-box'); // Parent container of messages
+
+    // Use event delegation to handle clicks on copy icons within the container
+    messageContainer.addEventListener('click', function(event) {
+        // Check if the clicked element has the class 'copy'
+        if (event.target.classList.contains('copy')) {
+            const icon = event.target;
+
+            // Find the closest message container to the clicked icon
+            const messageContainer = icon.closest('.message-sent, .message-received');
+
+            if (messageContainer) {
+                // Get the text content of the message
+                const messageText = messageContainer.querySelector('.message-content').textContent.trim();
+
+                // Copy the message text to the clipboard
+                navigator.clipboard.writeText(messageText)
+
+                    .catch((error) => {
+                        console.error('Failed to copy text:', error);
+                    });
+            }
+        }
     });
 });
+
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -964,117 +1161,77 @@ document.addEventListener('DOMContentLoaded', function() {
         chunkOverlapValue.textContent = this.value;
     };
 });
+document.addEventListener('DOMContentLoaded', function() {
+    // Select elements for the modal
+    var modal_expert = document.getElementById("expertFeaturesModal");
+    var modalContent_expert = document.querySelector(".modal-content_expert");
+    const openModalBtn = document.getElementById("openExpertFeatures");
+    const saveExpertBtn = document.getElementById("saveExpertFeatures");
 
 
-// Select the modal and its elements
-var modal_expert = document.getElementById("expertFeaturesModal");
-var openModalBtn = document.getElementById("openExpertFeatures");
-var closeExpertBtn = document.querySelector(".close_expert");
-var saveExpertBtn = document.getElementById("saveExpertFeatures");
-
-// Function to open the modal
-openModalBtn.onclick = function() {
-    modal_expert.style.display = "block";
-}
-
-// Function to close the modal when the user clicks on the 'x' button
-closeExpertBtn.onclick = function() {
-    modal_expert.style.display = "none";
-}
-
-// Function to close the modal when the user clicks outside of it
-window.onclick = function(event) {
-    if (event.target == modal_expert) {
-        modal_expert.style.display = "none";
+    // Function to open the modal
+    openModalBtn.onclick = function() {
+        modal_expert.classList.add('show');  // Use 'show' to make modal visible
     }
-}
 
-// Function to handle saving expert features
-saveExpertBtn.onclick = function() {
-    const chunkSize = document.getElementById("chunkSize").value;
-    const chunkOverlap = document.getElementById("chunkOverlap").value;
-    const numDocs = document.getElementById("numDocs").value;
-    const showSources = document.getElementById("showSources").checked;
-
-    console.log({
-        chunkSize,
-        chunkOverlap,
-        numDocs,
-        showSources
+    // Function to close the modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+        if (event.target == modal_expert) {
+            modal_expert.classList.remove('show');  // Remove 'show' to hide modal
+        }
     });
 
-    // Logic to send these values to your server or apply them locally
+    // Function to handle saving expert features
+    saveExpertBtn.onclick = function() {
+        const chunkSize = document.getElementById("chunkSize").value;
+        const chunkOverlap = document.getElementById("chunkOverlap").value;
+        const numDocs = document.getElementById("numDocs").value;
+        const showSources = document.getElementById("showSources").checked;
 
-    // Close the modal after saving
-    modal_expert.style.display = "none";
-}
+        console.log({
+            chunkSize,
+            chunkOverlap,
+            numDocs,
+            showSources
+        });
 
-document.getElementById('saveExpertFeatures').addEventListener('click', function() {
-    // Update the showSources flag based on the checkbox
-    showSources = document.getElementById('showSources').checked;
+        // Save expert features data to the server
+        const expertFeaturesData = {
+            label: 'Expert Features',
+            chunkSize: chunkSize,
+            chunkOverlap: chunkOverlap,
+            numDocs: numDocs
+        };
 
-    // Save other expert features data to the server (excluding showSources)
-    const chunkSize = document.getElementById('chunkSize').value;
-    const chunkOverlap = document.getElementById('chunkOverlap').value;
-    const numDocs = document.getElementById('numDocs').value;
+        const chatId = "{{ chat_id }}";  // Ensure this is rendered by Django
 
-    const expertFeaturesData = {
-        label: 'Expert Features',
-        chunkSize: chunkSize,
-        chunkOverlap: chunkOverlap,
-        numDocs: numDocs
-    };
-
-    console.log(expertFeaturesData);  // For debugging
-
-    fetch(`/chatbot/${chatId}/`, {  // Replace with your server endpoint
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value  // Django CSRF token for security
-        },
-        body: JSON.stringify(expertFeaturesData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data);
-        document.getElementById("expertFeaturesModal").style.display = "none";
-
-        // After saving, toggle the visibility of the sources
-        toggleSourceVisibility();
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+        fetch(`/chatbot/${chatId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value  // Django CSRF token for security
+            },
+            body: JSON.stringify(expertFeaturesData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            modal_expert.style.display = "none";  // Close modal on success
+            toggleSourceVisibility(showSources);  // Toggle sources visibility based on checkbox value
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
 });
 
-function prependSource(source) {
-    if (!source || source.length === 0) return;
-
-    const messagesList = document.querySelector('.messages-list');
-    const sourceItem = document.createElement('li');
-    sourceItem.className = 'message-sources';  // Add a class for all sources
-    sourceItem.innerHTML = `
-        <div class="message-sources-content">
-            ${source}
-        </div>`;
-
-    // If sources should be hidden, add a 'hidden' class
-    if (!showSources) {
-        sourceItem.classList.add('hidden');
-    }
-
-    const lastMessageReceived = messagesList.querySelector('.message-received');
-    if (lastMessageReceived) {
-        lastMessageReceived.insertAdjacentElement('afterend', sourceItem);
-    } else {
-        messagesList.appendChild(sourceItem);
-    }
-}
 
 // Function to toggle the visibility of sources based on the showSources flag
-function toggleSourceVisibility() {
+function toggleSourceVisibility(showSources) {
     const sources = document.querySelectorAll('.message-sources');
+    
+    // Debug log to check if sources are found
+    console.log('Toggling sources:', showSources, sources.length);
 
     sources.forEach(source => {
         if (showSources) {
@@ -1084,6 +1241,30 @@ function toggleSourceVisibility() {
         }
     });
 }
+
+function prependSource(source) {
+    if (!source || source.length === 0) return;
+
+    const messagesList = document.querySelector('.messages-list');
+    const sourceItem = document.createElement('li');
+    const showSources = document.getElementById("showSources").checked;  // Check the global setting
+
+    // Apply 'hidden' class if showSources is false
+    const hiddenClass = showSources ? '' : ' hidden';
+
+    sourceItem.innerHTML = `
+        <div class="message-sources${hiddenClass}">
+            ${source}
+        </div>`;
+
+    const lastMessageReceived = messagesList.querySelector('.message-received');
+    if (lastMessageReceived) {
+        lastMessageReceived.insertAdjacentElement('afterend', sourceItem);
+    } else {
+        messagesList.appendChild(sourceItem);
+    }
+}
+
 
 // Add a class to hide elements
 const style = document.createElement('style');
@@ -1095,72 +1276,6 @@ style.innerHTML = `
 document.head.appendChild(style);
 
 
-document.querySelector('.message-form').addEventListener('submit', function (event) {
-    event.preventDefault();
-
-    const message = document.querySelector('.message-input').value.trim();
-    const chatId = document.querySelector('.message-form').dataset.chatId || '';
-
-    if (message.length === 0) return;
-
-    // Display the user's message immediately
-    prependMessage('message-sent', 'You', message);
-
-    // Clear the input field
-    document.querySelector('.message-input').value = '';
-
-    if (chatId) {
-        // Send the message to the server and handle the response
-        fetch(`/chatbot/${chatId}/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-                'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'message': message
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert('Message handling failed: ' + data.error);
-            } else {
-                // Prepend the AI's response on top of the user's message
-                prependMessage('message-received', 'AI Chatbot', data.response);
-
-                // Prepend the sources below the AI's response
-                prependSource(data.source);
-
-                scrollToTop();  // Ensure it scrolls to the top
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while sending the message.');
-        });
-    } else {
-        // Start a new chat if no chatId exists
-        fetch('/start-chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-                'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'message': message
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert('Failed to start chat: ' + data.error);
-            } else {
-                window.location.href = `/chatbot/${data.chat_id}/`;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while starting the chat.');
-        });
-    }
-});
 
 function prependMessage(className, sender, content) {
     const messagesList = document.querySelector('.messages-list');
@@ -1170,37 +1285,26 @@ function prependMessage(className, sender, content) {
         <div class="message-text">
             <div class="message-sender">
                 <b>${sender}</b>
+            <div class="icons">
+                <i class="fa-regular fa-copy copy" id="copyIcon"></i>
+                <i class="fa-solid fa-file-arrow-down download"></i>
+            </div>
             </div>
             <div class="message-content">
                 ${content}
             </div>
-        </div>`;
+        </div>
+
+            `;
     
     // Prepend the new message to the top of the list
     messagesList.insertBefore(messageItem, messagesList.firstChild);
+
 
     // Ensure that the list scrolls to the top after prepending
     scrollToTop();
 }
 
-// function prependSource(source) {
-//     if (!source || source.length === 0) return;
-
-//     const messagesList = document.querySelector('.messages-list');
-//     const sourceItem = document.createElement('li');
-//     sourceItem.innerHTML = `
-//         <div class="message-sources">
-//             ${source}
-//         </div>`;
-
-//     // Insert the sources after the last AI response message
-//     const lastMessageReceived = messagesList.querySelector('.message-received');
-//     if (lastMessageReceived) {
-//         lastMessageReceived.insertAdjacentElement('afterend', sourceItem);
-//     } else {
-//         messagesList.appendChild(sourceItem);
-//     }
-// }
 
 function scrollToTop() {
     const messagesList = document.querySelector('.messages-list');
@@ -1209,6 +1313,7 @@ function scrollToTop() {
 
 // Add event listener to the paper plane icon to trigger form submission
 document.querySelector('.fa-paper-plane').addEventListener('click', function() {
+    
     document.querySelector('.message-form').dispatchEvent(new Event('submit', { cancelable: true }));
 });
 
@@ -1217,36 +1322,12 @@ window.onload = function () {
     scrollToTop();
 };
 
-
-const chatId = "{{ chat_id }}";
-
-// Add event listener to the file input field
-document.getElementById('myFile').addEventListener('change', function(event) {
-    const form = document.getElementById('ragForm');
-
-    // Perform form submission using Fetch API or any other method you prefer
-    const formData = new FormData(form);
-    
-    fetch(form.action, {
-        method: 'POST',
-        body: formData,
-    }).then(response => {
-        if (response.ok) {
-            // Redirect to the chat page after successful upload
-            const chatId = "{{ chat_id }}"; // Make sure chatId is defined
-            window.location.href = `{{ request.scheme }}://{{ request.get_host }}{% url 'chatbot' 'chatIdPlaceholder' %}`.replace('chatIdPlaceholder', chatId);
-        } else {
-            console.error('Failed to upload the document.');
-        }
-    }).catch(error => {
-        console.error('Error:', error);
-    });
-});
-
 document.getElementById('rag_url_link').addEventListener('keypress', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault();  // Prevent the default form submission
         submitUrl();
+        document.getElementById('loadingSpinnerUrl').classList.remove('hidden');
+
     }
 });
 
@@ -1257,6 +1338,7 @@ document.getElementById('rag_url_link').addEventListener('blur', function(event)
 function submitUrl() {
     const urlInput = document.getElementById('rag_url_link').value.trim();
     const chatId = "{{ chat_id }}";
+
 
 
     fetch(`/chatbot/${chatId}/`, {
@@ -1271,9 +1353,11 @@ function submitUrl() {
     })
     .then(response => response.json())
     .then(data => {
+
         if (data.error) {
             alert('Error processing URL: ' + data.error);
         } else {
+            document.getElementById('loadingSpinnerUrl').classList.add('hidden');
             window.location.reload(); // For example, reload the page to update the file list
         }
     })
@@ -1303,7 +1387,7 @@ function submitRole(role) {
     .then(data => {
         if (data.error) {
             alert('Error setting role: ' + data.error);
-        }a
+        }
     })
     .catch(error => console.error('Error:', error));
 }
@@ -1332,10 +1416,6 @@ const modal = document.getElementById("customRoleModal");
 
 // Get the button that opens the modal
 const otherButton = document.getElementById("customRole");
-
-// Get the <span> element that closes the modal
-const span = document.getElementsByClassName("close")[0];
-
 // Get the submit button and textarea
 const submitButton = document.getElementById("submitCustomRole");
 const customRoleInput = document.getElementById("customRoleInput");
@@ -1346,17 +1426,12 @@ otherButton.addEventListener('click', function(event) {
     modal.style.display = "block";
 });
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-    modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
     if (event.target == modal) {
         modal.style.display = "none";
     }
 }
+
 
 // When the user clicks on the submit button, send the custom role to the server
 submitButton.addEventListener('click', function() {
@@ -1390,120 +1465,144 @@ submitButton.addEventListener('click', function() {
     }
 });
 
+creativitySlider.oninput = function() {
+    // Get the element by its ID (make sure it exists in the DOM)
+    const CreativityValue = document.getElementById('CreativityValue');
+    
+    // Update the text content with the slider's value and append "%"
+    CreativityValue.textContent = creativitySlider.value + ' %';
+};
+
 creativitySlider.addEventListener('input', function() {
-    const sliderValue = creativitySlider.value;
-    console.log('Creativity level:', sliderValue);  // Do something with the value
+const sliderValue = creativitySlider.value;
+const chatId = "{{ chat_id }}";  // Use the chat_id available in your template
 
-    // Example: Send the value to the server
-    const chatId = "{{ chat_id }}";  // Use the chat_id available in your template
 
-    fetch(`/chatbot/${chatId}/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: new URLSearchParams({
-            'creativity_level': sliderValue  // Send the slider value to the server
-        })
+
+fetch(`/chatbot/${chatId}/`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+    },
+    body: new URLSearchParams({
+        'creativity_level': sliderValue  // Send the slider value to the server
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            alert('Error setting creativity level: ' + data.error);
-        } else {
-            console.log('Creativity level set to:', sliderValue);  // Optionally, you can show a message or update the UI
-        }
-    })
-    .catch(error => console.error('Error:', error));
+})
+.then(response => response.json())
+.then(data => {
+    if (data.error) {
+        alert('Error setting creativity level: ' + data.error);
+    } else {
+        console.log('Creativity level set to:', sliderValue); 
+    }
+})
+.catch(error => console.error('Error:', error));
 });
-// Function to send all active roles with their slider values
-// Function to send all active roles with their slider values
+
 function sendActiveRoles() {
-    const chatId = "{{ chat_id }}";  // Use the chat_id available in your template
-    
-    // Gather all active buttons and their associated slider values
-    const activeRoles = [];
-    const activeButtons = document.querySelectorAll('button.active');
-    
-    activeButtons.forEach(button => {
-        const role = button.id;  // Assuming button id is the role name
-        const slider = button.parentNode.querySelector('.slider'); // Ensure correct slider is selected
-        const value = slider ? slider.value : null;  // Capture the slider value or set to null if not found
+const chatId = "{{ chat_id }}";  // Use the chat_id available in your template
 
-        // Log to check if the slider is correctly identified and value is captured
-        console.log(`Role: ${role}, Value: ${value}`);
+// Gather all active buttons and their associated slider values
+const activeRoles = [];
+const activeButtons = document.querySelectorAll('button.active');
 
-        if (value !== null) {
-            activeRoles.push({ role, value });
-        }
-    });
-    
-    // Prepare the data to send
-    const data = { 'type': 'roles' };  
-    activeRoles.forEach(({ role, value }) => {
-        data[role] = value;  
-    });
-    
-    // Log data for debugging
-    console.log('Sending data:', data);
+activeButtons.forEach(button => {
+    const role = button.id;  // Assuming button id is the role name
+    const slider = button.parentNode.querySelector('.slider'); // Ensure correct slider is selected
+    const value = slider ? slider.value : null;  // Capture the slider value or set to null if not found
 
-    // Send the data to the server
-    fetch(`/chatbot/${chatId}/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: new URLSearchParams(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            alert('Error setting roles: ' + data.error);
-        } else {
-            console.log('Roles and values sent successfully:', data);
-        }
-    })
-    .catch(error => console.error('Error:', error));
+
+
+
+    // Log to check if the slider is correctly identified and value is captured
+    console.log(`Role: ${role}, Value: ${value}`);
+
+    if (value !== null) {
+        activeRoles.push({ role, value });
+    }
+});
+
+// Prepare the data to send
+const data = { 'type': 'roles' };  
+activeRoles.forEach(({ role, value }) => {
+    data[role] = value;  
+});
+
+// Log data for debugging
+console.log('Sending data:', data);
+
+// Send the data to the server
+fetch(`/chatbot/${chatId}/`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+    },
+    body: new URLSearchParams(data)
+})
+.then(response => response.json())
+.then(data => {
+    if (data.error) {
+        alert('Error setting roles: ' + data.error);
+    } else {
+        console.log('Roles and values sent successfully:', data);
+    }
+})
+.catch(error => console.error('Error:', error));
 }
 
 // Event listeners for buttons
 document.getElementById('short_answers').addEventListener('click', function() {
-    handleButtonClick('short_answers');
+handleButtonClick('short_answers');
 });
 
 document.getElementById('bullet_points').addEventListener('click', function() {
-    handleButtonClick('bullet_points');
+handleButtonClick('bullet_points');
 });
 
 // Add event listeners for sliders
 document.getElementById('shortAnswersSlider').addEventListener('input', function() {
-    handleSliderChange('short_answers');
+handleSliderChange('short_answers', 'shortAnswersSlider', 'ShortAnswersValue', ' lines');
 });
 
 document.getElementById('bulletPointsSlider').addEventListener('input', function() {
-    handleSliderChange('bullet_points');
+handleSliderChange('bullet_points', 'bulletPointsSlider' ,'BulletPointsValue', ' points');
 });
 
-function handleButtonClick(buttonId) {
-    // Get the clicked button
-    const button = document.getElementById(buttonId);
+function updateSliderValue(slider, slider_value, unit) {
+// Get the value from the slider
+const sliderValue = document.getElementById(slider).value;
 
-    // Toggle active class on the clicked button
-    button.classList.toggle('active');
-
-    // Send all active roles and their slider values
-    sendActiveRoles();
+// Update the corresponding display element with the slider value
+document.getElementById(slider_value).textContent = `${sliderValue}${unit}`;
 }
 
-function handleSliderChange(roleId) {
-    // Check if the corresponding button is active
-    const button = document.getElementById(roleId);
-    if (button.classList.contains('active')) {
-        // Send all active roles and their slider values
-        sendActiveRoles();
-    }
+function handleButtonClick(buttonId) {
+// Get the clicked button
+const button = document.getElementById(buttonId);
+
+// Toggle active class on the clicked button
+button.classList.toggle('active');
+
+// Debugging log to see if the button becomes active
+console.log(`Button ${buttonId} is now ${button.classList.contains('active') ? 'active' : 'inactive'}`);
+
+// Send all active roles and their slider values
+sendActiveRoles();
+}
+
+function handleSliderChange(roleId, slider, slider_value, unit) {
+// Get the corresponding button
+const button = document.getElementById(roleId);
+
+// Debugging log to check if the function is triggered and button's state
+console.log(`Slider for ${roleId} changed. Button is ${button.classList.contains('active') ? 'active' : 'inactive'}`);
+
+if (button.classList.contains('active')) {
+    sendActiveRoles();
+    updateSliderValue(slider, slider_value, unit);
+}
 }
 
 // Function to handle the selection of a role
@@ -1532,7 +1631,6 @@ window.onload = function() {
     selectRole('default');
     document.querySelector('.dropdown-content a[data-role="default"]').classList.add('active');
 };
-
 
 
 document.getElementById('clearChat').addEventListener('click', function() {
@@ -1598,10 +1696,158 @@ document.getElementById('clearAll').addEventListener('click', function() {
     .catch(error => console.error('Error:', error));
 });
 
+document.querySelector('.message-form').addEventListener('submit', function (event) {
+event.preventDefault();
+
+const message = document.querySelector('.message-input').value.trim();
+const chatId = document.querySelector('.message-form').dataset.chatId || '';
+
+if (message.length === 0 && !hasFile) return; // Ensure there's either a message or a file
+prependMessage('message-sent', 'You', message);
+document.querySelector('.message-input').value = '';
+document.getElementById('loadingSpinnerMessage').classList.remove('hidden');
+document.getElementById('sendMessageButton').classList.add('blind');
+
+if (chatId) {
+    // Send message to the server
+    fetch(`/chatbot/${chatId}/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'message': message
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        document.getElementById('loadingSpinnerMessage').classList.add('hidden');
+        document.getElementById('sendMessageButton').classList.remove('blind');
 
 
-    </script>
+        if (data.error) {
+            alert('Message handling failed: ' + data.error);
+        } else {
+            prependMessage('message-received', 'AI Chatbot', data.response);
+            prependSource(data.source);
+            submitRoleSettings(chatId);
+            scrollToTop();  // Ensure it scrolls to the top
+        }
+    })
+    } else {
+        fetch('/start-chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'message': message
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Failed to start chat: ' + data.error);
+            } else {
+                const newChatId = data.chat_id;               
+                window.location.href = `/chatbot/${newChatId}/`;
+
+                // document.querySelector('.message-form').dataset.chatId = newChatId;
+                submitRoleSettings(newChatId);
+            }
+        })
+    }
+});
 
 
+// Function to submit role settings
+function submitRoleSettings(chatIdData) {
+    if (chatIdData) {
+        const role = document.querySelector('.dropdown-content a.active').dataset.role;
+        
+        // Now that chat_id is available, associate the role with it
+        fetch(`/chatbot/${chatId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: new URLSearchParams({
+                'role': role
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error setting role: ' + data.error);
+            } else {
+                alert('Role setting saved successfully for chat_id:', chatId);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        console.error('No chat_id available');
+    }
+}
 
+
+document.getElementById('myFile').addEventListener('change', function(event) {
+const fileInput = document.getElementById('myFile');
+const hasFile = fileInput.files.length > 0;
+const chatId = document.querySelector('.message-form').dataset.chatId || '';
+
+if (hasFile && chatId) {
+    const formData = new FormData();
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    formData.append('document', fileInput.files[0]);
+
+    document.getElementById('loadingSpinnerDocument').classList.remove('blind');
+
+    // Upload file to server for an existing chat
+    fetch(`/chatbot/${chatId}/`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        document.getElementById('loadingSpinnerDocument').classList.add('blind');
+
+
+        if (data.error) {
+            alert('Error uploading file: ' + data.error);
+        } else {
+            window.location.reload();  // Refresh to show uploaded files
+        }
+    })
+    .catch(error => {
+        console.error('Error uploading file:', error);
+        alert('An error occurred while uploading the file.');
+    });
+} else if (hasFile && !chatId) {
+    // File upload in the context of starting a new chat
+    const formData = new FormData();
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    formData.append('document', fileInput.files[0]);
+
+    // Start a new chat with file upload
+    fetch('/start-chat', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Failed to start chat: ' + data.error);
+        } else {
+            window.location.href = `/chatbot/${data.chat_id}/`;
+        }
+    })
+    .catch(error => {
+        console.error('Error starting chat:', error);
+        alert('An error occurred while starting the chat.');
+    });
+}
+});
+
+</script>
 {% endblock %}

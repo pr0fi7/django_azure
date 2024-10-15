@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+
+{% block styles %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f7f7f7;
+    }
+
+    .container {
+        width: 90%;
+        margin: 50px auto;
+    }
+
+    h1 {
+        font-size: 24px;
+        font-weight: normal;
+        margin-bottom: 10px;
+    }
+
+    .search-bar {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+    }
+
+    .search-bar input[type="text"] {
+        width: 300px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        margin-bottom: 20px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    thead {
+        background-color: #f7f7f7;
+        border-bottom: 2px solid #007BFF;
+    }
+
+    thead th {
+        text-align: left;
+        padding: 12px 15px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #ddd;
+    }
+
+    tbody td {
+        padding: 12px 15px;
+        font-size: 14px;
+        color: #555;
+    }
+
+    tbody td a {
+        text-decoration: none;
+        color: #333;
+    }
+
+    .actions i {
+        cursor: pointer;
+        padding: 5px;
+        color: #333;
+    }
+
+    .actions i:hover {
+        color: #007BFF;
+    }
+
+    .footer {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 12px;
+        color: #777;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Include the navbar -->
+    {% include 'navbar.html' %}
+
+    
+    
+    <body>
+
+        <div class="container">
+            <h1>Active Documents</h1>
+        
+            <div class="search-bar">
+                <input type="text" placeholder="Files, departments,..." />
+            </div>
+        
+            <table>
+                <thead>
+                    <tr>
+                        <th>Documents</th>
+                        <th>Date</th>
+                        <th>Submitted by</th>
+                        <th>Last update</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="#">Car_policy.pdf</a></td>
+                        <td>12/01/2024</td>
+                        <td>John Doe</td>
+                        <td>15/02/2024</td>
+                        <td class="actions">
+                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-trash"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">Validation_trials_guidelines.ppt</a></td>
+                        <td>10/01/2024</td>
+                        <td>Jane Doe</td>
+                        <td>20/02/2024</td>
+                        <td class="actions">
+                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-trash"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">SX302_maintenance_routine.pdf</a></td>
+                        <td>08/01/2024</td>
+                        <td>Robert Smith</td>
+                        <td>22/02/2024</td>
+                        <td class="actions">
+                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-trash"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">Dev_flow_candidate_25363.png</a></td>
+                        <td>05/01/2024</td>
+                        <td>Alex Johnson</td>
+                        <td>25/02/2024</td>
+                        <td class="actions">
+                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-trash"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">Secret_project.pdf</a></td>
+                        <td>03/01/2024</td>
+                        <td>Emma Stone</td>
+                        <td>18/02/2024</td>
+                        <td class="actions">
+                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-trash"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">Catering.ppt</a></td>
+                        <td>15/12/2023</td>
+                        <td>Lisa Black</td>
+                        <td>05/02/2024</td>
+                        <td class="actions">
+                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-trash"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">Travel_policy.pdf</a></td>
+                        <td>05/12/2023</td>
+                        <td>Michael White</td>
+                        <td>10/02/2024</td>
+                        <td class="actions">
+                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-trash"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">MidYear_review.xls</a></td>
+                        <td>01/12/2023</td>
+                        <td>Susan Green</td>
+                        <td>12/02/2024</td>
+                        <td class="actions">
+                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-trash"></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        
+            <div class="footer">
+                <p>Footer: Version number: premvp 1.0 - supported files: zip, xls, txt, doc, pdf, ppt, jpg, png...</p>
+            </div>
+        </div>
+        
+        </body>
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}

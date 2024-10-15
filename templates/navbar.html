@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block styles %}
+<style>
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: white;
+        padding: 10px 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .navbar-left {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Burger Menu Icon Styles */
+    .menu-icon {
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+        margin-right: 10px;
+        position: relative;
+    }
+
+    .menu-icon div {
+        width: 25px;
+        height: 3px;
+        background-color: #333;
+        margin: 4px 0;
+        transition: all 0.3s ease;
+    }
+
+    /* Full-height side menu */
+    .side-menu {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 200;
+        top: 0;
+        left: 0;
+        background-color: black;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+    }
+
+    .side-menu.active {
+        width: 250px; /* Adjust the width as needed */
+    }
+
+    .side-menu a {
+        padding: 10px 15px;
+        text-decoration: none;
+        font-size: 20px;
+        color: white;
+        display: block;
+        transition: 0.3s;
+    }
+
+    .side-menu a:hover {
+        background-color: #444;
+    }
+
+    .side-menu .close-btn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 30px;
+        margin-left: 50px;
+        color: white;
+    }
+
+    .logo {
+        width: 50px;
+        height: auto;
+    }
+
+    .navbar-center {
+        display: flex;
+        list-style-type: none;
+        padding-left: 0;
+        margin: auto;
+    }
+
+    .navbar-center li {
+        margin: 0 20px;
+    }
+
+    .navbar-center a {
+        text-decoration: none;
+        color: #555;
+        font-size: 16px;
+    }
+
+    .navbar-right {
+        display: flex;
+        align-items: center;
+    }
+
+    .profile-icon {
+        font-size: 20px;
+        margin-right: 5px;
+    }
+
+    .profile-name {
+        font-size: 16px;
+        color: #555;
+    }
+
+    /* Adjust position for the profile section */
+    .navbar-right {
+        position: absolute;
+        right: 10px;
+    }
+
+    /* Ensure the body doesn't scroll when menu is open */
+    body.menu-open {
+        overflow: hidden;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<nav class="navbar">
+    <div class="navbar-left">
+        <!-- Burger Menu Icon -->
+        <div class="menu-icon" id="burger-menu">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <img src="/static/media/logo.png" alt="logo" class="logo">
+        
+    </div>
+    <ul class="navbar-center" id="nav-links">
+        <li><a href="">Users</a></li>
+        <li><a href="">Documents</a></li>
+        <li><a href="">Settings</a></li>
+    </ul>
+    <div class="navbar-right">
+        <span class="profile-icon">&#128100;</span>
+        <span class="profile-name">{{ user.username }}</span>
+    </div>
+</nav>
+
+<!-- Full-height black & white menu -->
+<div id="side-menu" class="side-menu">
+    <a href="javascript:void(0)" class="close-btn" id="close-btn">&times;</a>
+    <a href="/start-chat">Home</a>
+    <a href="/propose">Documents Allocation</a>
+    <a href="/validated">In process</a>
+    <a href="/to_validate">Active</a>
+    <a href="/users">Users Rights</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const burgerMenu = document.getElementById('burger-menu');
+    const sideMenu = document.getElementById('side-menu');
+    const closeBtn = document.getElementById('close-btn');
+
+    // Function to open the side menu
+    burgerMenu.addEventListener('click', function() {
+        sideMenu.classList.add('active');
+        document.body.classList.add('menu-open');  // Disable scrolling
+    });
+
+    // Function to close the side menu
+    closeBtn.addEventListener('click', function() {
+        sideMenu.classList.remove('active');
+        document.body.classList.remove('menu-open');  // Enable scrolling again
+    });
+</script>
+{% endblock %}

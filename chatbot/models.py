@@ -16,3 +16,22 @@ class Chat(models.Model):
     def __str__(self):
         return f'{self.user.username}: {self.message}'
     
+
+class UserSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    chat_id = models.OneToOneField(Chat, on_delete=models.CASCADE, null=True, blank=True)
+    role = models.CharField(max_length=100, default='default')
+    creativity = models.FloatField(default=0.5)
+    length = models.IntegerField(default=0)
+    bullet_points = models.IntegerField(default=0)
+    chunk_size = models.IntegerField(default=600)
+    chunk_overlap = models.IntegerField(default=200)
+    num_docs = models.IntegerField(default=5)
+    show_source = models.BooleanField(default=True)
+
+
+
+    def __str__(self):
+        return f'{self.user.username} settings'
+    
+    
